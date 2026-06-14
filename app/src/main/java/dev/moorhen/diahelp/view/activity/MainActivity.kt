@@ -1,0 +1,80 @@
+package dev.moorhen.diahelp.view.activity
+
+import android.os.Bundle
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.fragment.app.Fragment
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import dev.moorhen.diahelp.R
+import dev.moorhen.diahelp.view.fragments.CalculatorContainerFragment
+import dev.moorhen.diahelp.view.fragments.ChartFragment
+import dev.moorhen.diahelp.view.fragments.MedicalIndicationsFragment
+import dev.moorhen.diahelp.view.fragments.ProfileFragment
+import dev.moorhen.diahelp.view.fragments.SugarNoteFragment
+import dev.moorhen.diahelp.viewmodel.MainViewModel
+
+class MainActivity : AppCompatActivity() {
+
+    private val viewModel: MainViewModel by viewModels()
+    private lateinit var bottomNav: BottomNavigationView
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val prefs = getSharedPreferences("app_settings", MODE_PRIVATE)
+        val isDarkTheme = prefs.getBoolean("dark_theme", false)
+
+        AppCompatDelegate.setDefaultNightMode(
+            if (isDarkTheme) AppCompatDelegate.MODE_NIGHT_YES
+            else AppCompatDelegate.MODE_NIGHT_NO
+        )
+
+        setContentView(R.layout.activity_main)
+
+        bottomNav = findViewById(R.id.bottomNavigationView)
+
+        if (savedInstanceState == null) {
+            openFragment(SugarNoteFragment())
+        }
+
+        bottomNav.selectedItemId = R.id.navigation_sugarnote
+
+        bottomNav.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.navigation_correction -> {
+                    openFragment(CalculatorContainerFragment())
+                    true
+                }
+                R.id.navigation_profile -> {
+                    openFragment(ProfileFragment())
+                    true
+                }
+                R.id.navigation_sugarnote ->{
+                    openFragment(SugarNoteFragment())
+                    true
+                }
+                R.id.navigation_medical_indications ->{
+                    openFragment(MedicalIndicationsFragment())
+                    true
+                }
+                R.id.navigation_chart ->{
+                    openFragment(ChartFragment())
+                    true
+                }
+                else -> false
+            }
+        }
+    }
+
+    private fun openFragment(fragment: Fragment) {
+        val currentFragment = supportFragmentManager.findFragmentById(R.id.fragment_container)
+
+        if (currentFragment != null && currentFragment::class == fragment::class) {
+            return
+        }
+
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, fragment)
+            .commit()
+    }
+}

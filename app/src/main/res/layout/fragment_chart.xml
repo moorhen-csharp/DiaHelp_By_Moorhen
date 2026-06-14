@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
+
+    <!-- Выбор периода -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/chartPeriodDropdownLayout"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginTop="10dp"
+        app:boxCornerRadiusBottomEnd="25dp"
+        app:boxCornerRadiusBottomStart="25dp"
+        app:boxCornerRadiusTopEnd="25dp"
+        app:boxCornerRadiusTopStart="25dp"
+        app:boxStrokeColor="@color/color_TextInputLayout"
+        app:hintTextColor="@color/color_TextInputLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <AutoCompleteTextView
+            android:id="@+id/chartPeriodDropdown"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@android:color/transparent"
+            android:hint="Выберите период"
+            android:inputType="none"
+            android:textColor="@color/color_TextInputLayout"
+            android:textColorHint="@color/color_TextInputLayout" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Переключатель Сахар / Инсулин -->
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/chartToggleGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        app:checkedButton="@id/btnChartSugar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/chartPeriodDropdownLayout"
+        app:selectionRequired="true"
+        app:singleSelection="true">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnChartSugar"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="140dp"
+            android:layout_height="48dp"
+            android:checkable="true"
+            android:checked="true"
+            android:text="Сахар" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnChartInsulin"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="140dp"
+            android:layout_height="48dp"
+            android:checkable="true"
+            android:text="Инсулин" />
+    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+    <!-- График -->
+    <com.github.mikephil.charting.charts.LineChart
+        android:id="@+id/lineChart"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="10dp"
+        android:backgroundTint="@color/white"
+        android:background="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/chartToggleGroup" />
+
+    <!-- Сообщение, если данных нет -->
+    <TextView
+        android:id="@+id/tvNoChartData"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Нет данных для отображения"
+        android:textSize="16sp"
+        android:textColor="@color/white"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/lineChart"
+        app:layout_constraintEnd_toEndOf="@id/lineChart"
+        app:layout_constraintStart_toStartOf="@id/lineChart"
+        app:layout_constraintTop_toTopOf="@id/lineChart" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
