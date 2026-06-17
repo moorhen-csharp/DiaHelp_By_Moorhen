@@ -6,10 +6,10 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <!-- Health Connect (заготовка для будущей интеграции) -->
-<!--    <uses-permission android:name="android.permission.health.READ_BLOOD_GLUCOSE" />-->
-<!--    <uses-permission android:name="android.permission.health.WRITE_BLOOD_GLUCOSE" />-->
-<!--    <uses-permission android:name="android.permission.health.READ_INSULIN_DELIVERY" tools:ignore="ManifestOrder" />-->
-<!--    <uses-permission android:name="android.permission.health.WRITE_INSULIN_DELIVERY" tools:ignore="ManifestOrder" />-->
+    <uses-permission android:name="android.permission.health.READ_BLOOD_GLUCOSE" />
+    <uses-permission android:name="android.permission.health.WRITE_BLOOD_GLUCOSE" />
+    <uses-permission android:name="android.permission.health.READ_INSULIN_DELIVERY" tools:ignore="ManifestOrder" />
+    <uses-permission android:name="android.permission.health.WRITE_INSULIN_DELIVERY" tools:ignore="ManifestOrder" />
 
     <application
         android:allowBackup="true"
@@ -26,9 +26,9 @@
             android:exported="true">
 
             <!-- Health Connect: разрешает приложению быть выбранным в "Permissions rationale" -->
-<!--            <intent-filter>-->
-<!--                <action android:name="androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE" />-->
-<!--            </intent-filter>-->
+            <intent-filter>
+                <action android:name="androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE" />
+            </intent-filter>
         </activity>
 
         <activity android:name=".view.activity.RegistrationActivity"
@@ -58,14 +58,14 @@
         </provider>
 
         <!-- Health Connect: страница с описанием использования прав (заготовка) -->
-<!--        <activity-alias-->
-<!--            android:name=".PermissionsRationaleActivity"-->
-<!--            android:exported="true"-->
-<!--            android:targetActivity=".view.activity.MainActivity">-->
-<!--            <intent-filter>-->
-<!--                <action android:name="androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE" />-->
-<!--            </intent-filter>-->
-<!--        </activity-alias>-->
+        <activity-alias
+            android:name=".PermissionsRationaleActivity"
+            android:exported="true"
+            android:targetActivity=".view.activity.MainActivity">
+            <intent-filter>
+                <action android:name="androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE" />
+            </intent-filter>
+        </activity-alias>
 
     </application>
 

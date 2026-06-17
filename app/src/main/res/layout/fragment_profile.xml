@@ -139,6 +139,84 @@
         app:layout_constraintStart_toEndOf="@+id/btnExportCsv"
         app:layout_constraintTop_toBottomOf="@+id/tvReminderTime"/>
 
+    <!-- ─── Health Connect ─────────────────────────────── -->
+
+    <View
+        android:id="@+id/dividerHc"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginTop="20dp"
+        android:background="?attr/colorOutline"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnExportPdf" />
+
+    <TextView
+        android:id="@+id/tvHcTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="12dp"
+        android:text="Health Connect"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/dividerHc" />
+
+    <TextView
+        android:id="@+id/tvHcStatus"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="60dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="24dp"
+        android:text="Проверка…"
+        android:textSize="13sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvHcTitle" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnHcExport"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="10dp"
+        android:text="Экспорт в HC"
+        android:backgroundTint="@color/color_button"
+        android:textColor="@color/color_text_button"
+        android:enabled="false"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvHcStatus" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnHcImport"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="10dp"
+        android:text="Импорт из HC"
+        android:backgroundTint="@color/color_button"
+        android:textColor="@color/color_text_button"
+        android:enabled="false"
+        app:layout_constraintStart_toEndOf="@+id/btnHcExport"
+        app:layout_constraintTop_toBottomOf="@+id/tvHcStatus" />
+
+    <ProgressBar
+        android:id="@+id/pbHc"
+        style="?android:attr/progressBarStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="10dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/btnHcExport"
+        app:layout_constraintStart_toEndOf="@+id/btnHcImport"
+        app:layout_constraintTop_toTopOf="@+id/btnHcExport" />
+
+    <!-- ─────────────────────────────────────────────────── -->
+
     <Button
         android:id="@+id/btnLogout"
         android:layout_width="wrap_content"

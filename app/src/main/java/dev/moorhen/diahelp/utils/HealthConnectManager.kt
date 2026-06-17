@@ -1,68 +1,97 @@
-//package dev.moorhen.diahelp.utils
-//
-//import android.content.Context
-//import androidx.health.connect.client.HealthConnectClient
-//import androidx.health.connect.client.PermissionController
-//import androidx.health.connect.client.permission.HealthPermission
-//import androidx.health.connect.client.records.BloodGlucoseRecord
-//import androidx.health.connect.client.records.InsulinDeliveryRecord
-//
-///**
-// * Заготовка для интеграции с Health Connect.
-// *
-// * На данный момент класс только проверяет наличие Health Connect на устройстве
-// * и определяет набор необходимых разрешений. Чтение/запись данных глюкозы
-// * и инсулина будет реализовано на следующем этапе.
-// *
-// * Зависимость "androidx.health.connect:connect-client" уже добавлена в build.gradle.kts,
-// * а необходимые <uses-permission> — в AndroidManifest.xml.
-// */
-//object HealthConnectManager {
-//
-//    /**
-//     * Набор разрешений, которые потребуются приложению при полной интеграции:
-//     * чтение и запись уровня глюкозы крови и доз инсулина.
-//     */
-//    val PERMISSIONS = setOf(
-//        HealthPermission.getReadPermission(BloodGlucoseRecord::class),
-//        HealthPermission.getWritePermission(BloodGlucoseRecord::class),
-//        HealthPermission.getReadPermission(InsulinDeliveryRecord::class),
-//        HealthPermission.getWritePermission(InsulinDeliveryRecord::class),
-//    )
-//
-//    /**
-//     * Проверяет, доступен ли Health Connect на устройстве (установлено приложение
-//     * Health Connect / поддерживается системой).
-//     */
-//    fun isAvailable(context: Context): Boolean {
-//        val status = HealthConnectClient.getSdkStatus(context)
-//        return status == HealthConnectClient.SDK_AVAILABLE
-//    }
-//
-//    /**
-//     * Возвращает клиент Health Connect, если он доступен, иначе null.
-//     */
-//    fun getClientOrNull(context: Context): HealthConnectClient? {
-//        return if (isAvailable(context)) {
-//            HealthConnectClient.getOrCreate(context)
-//        } else {
-//            null
-//        }
-//    }
-//
-//    /**
-//     * Возвращает контракт для запроса разрешений Health Connect.
-//     * Использование (в Activity/Fragment):
-//     *
-//     * val requestPermissions = registerForActivityResult(
-//     *     HealthConnectManager.createPermissionRequestContract()
-//     * ) { granted -> ... }
-//     *
-//     * requestPermissions.launch(HealthConnectManager.PERMISSIONS)
-//     */
-//    fun createPermissionRequestContract() =
-//        PermissionController.createRequestPermissionResultContract()
-//
-//    // TODO: реализовать чтение последних записей BloodGlucoseRecord/InsulinDeliveryRecord
-//    // TODO: реализовать запись новых записей SugarModel/InsulinModel в Health Connect
-//}
+package dev.moorhen.diahelp.utils
+
+import android.content.Context
+import androidx.health.connect.client.HealthConnectClient
+import androidx.health.connect.client.PermissionController
+import androidx.health.connect.client.permission.HealthPermission
+import androidx.health.connect.client.records.BloodGlucoseRecord
+import androidx.health.connect.client.records.metadata.Metadata
+import androidx.health.connect.client.request.ReadRecordsRequest
+import androidx.health.connect.client.time.TimeRangeFilter
+import androidx.health.connect.client.units.BloodGlucose
+import dev.moorhen.diahelp.data.model.InsulinModel
+import dev.moorhen.diahelp.data.model.SugarModel
+import java.time.Instant
+import java.time.ZoneOffset
+import java.util.Date
+
+object HealthConnectManager {
+
+    val PERMISSIONS = setOf(
+        HealthPermission.getReadPermission(BloodGlucoseRecord::class),
+        HealthPermission.getWritePermission(BloodGlucoseRecord::class),
+    )
+
+    fun isAvailable(context: Context): Boolean =
+        HealthConnectClient.getSdkStatus(context) == HealthConnectClient.SDK_AVAILABLE
+
+    fun getClientOrNull(context: Context): HealthConnectClient? =
+        if (isAvailable(context)) HealthConnectClient.getOrCreate(context) else null
+
+    fun createPermissionRequestContract() =
+        PermissionController.createRequestPermissionResultContract()
+
+    suspend fun hasAllPermissions(client: HealthConnectClient): Boolean =
+        client.permissionController.getGrantedPermissions().containsAll(PERMISSIONS)
+
+    suspend fun writeSugarNotes(
+        client: HealthConnectClient,
+        notes: List<SugarModel>
+    ): Int {
+        val records = notes
+            .filter { it.SugarLevel > 0 }
+            .map { note ->
+                val instant = note.Date.toInstant()
+                BloodGlucoseRecord(
+                    time = instant,
+                    zoneOffset = ZoneOffset.systemDefault().rules.getOffset(instant),
+                    level = BloodGlucose.millimolesPerLiter(note.SugarLevel),
+                    specimenSource = BloodGlucoseRecord.SPECIMEN_SOURCE_CAPILLARY_BLOOD,
+                    metadata = Metadata.manualEntry()                )
+            }
+        if (records.isEmpty()) return 0
+        client.insertRecords(records)
+        return records.size
+    }
+
+    @Suppress("UNUSED_PARAMETER")
+    suspend fun writeInsulinNotes(
+        client: HealthConnectClient,
+        notes: List<InsulinModel>
+    ): Int = 0
+
+    suspend fun readBloodGlucose(
+        client: HealthConnectClient,
+        userId: Int,
+        startMs: Long = System.currentTimeMillis() - 30L * 24 * 3600 * 1000,
+        endMs: Long = System.currentTimeMillis()
+    ): List<SugarModel> {
+        val response = client.readRecords(
+            ReadRecordsRequest(
+                recordType = BloodGlucoseRecord::class,
+                timeRangeFilter = TimeRangeFilter.between(
+                    Instant.ofEpochMilli(startMs),
+                    Instant.ofEpochMilli(endMs)
+                )
+            )
+        )
+        return response.records.map { record ->
+            SugarModel(
+                userId = userId,
+                SugarLevel = record.level.inMillimolesPerLiter,
+                MeasurementTime = "Другое",
+                HealthType = "Норма",
+                InsulinDose = 0.0,
+                Date = Date(record.time.toEpochMilli())
+            )
+        }
+    }
+
+    @Suppress("UNUSED_PARAMETER")
+    suspend fun readInsulinDelivery(
+        client: HealthConnectClient,
+        userId: Int,
+        startMs: Long = System.currentTimeMillis() - 30L * 24 * 3600 * 1000,
+        endMs: Long = System.currentTimeMillis()
+    ): List<InsulinModel> = emptyList()
+}

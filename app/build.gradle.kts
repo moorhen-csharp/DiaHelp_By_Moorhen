@@ -55,7 +55,7 @@ dependencies {
     implementation("androidx.viewpager2:viewpager2:1.1.0")
 
     //Health Connect (заготовка для будущей интеграции)
-    implementation("androidx.health.connect:connect-client:1.1.0-alpha07")
+    implementation("androidx.health.connect:connect-client:1.1.0-rc01")
 
     //Fragment KTX для viewModels()
     implementation("androidx.fragment:fragment-ktx:1.8.9")
