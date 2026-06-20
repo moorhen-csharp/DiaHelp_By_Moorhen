@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -50,12 +51,29 @@ class ProfileFragment : Fragment() {
     private val requestHcPermissions = registerForActivityResult(
         HealthConnectManager.createPermissionRequestContract()
     ) { granted ->
+        Log.d("HC_DEBUG", "Callback fired. Granted permissions: $granted")
         if (granted.containsAll(HealthConnectManager.PERMISSIONS)) {
             hcViewModel.checkStatus()
         } else {
             Toast.makeText(
                 requireContext(),
                 "Предоставьте все разрешения Health Connect для синхронизации данных",
+                Toast.LENGTH_LONG
+            ).show()
+        }
+    }
+
+    /** Безопасный запуск запроса разрешений HC с логированием и обработкой ошибок. */
+    private fun launchHcPermissionRequest() {
+        Log.d("HC_DEBUG", "Button clicked. Attempting to launch with permissions: ${HealthConnectManager.PERMISSIONS}")
+        try {
+            requestHcPermissions.launch(HealthConnectManager.PERMISSIONS)
+            Log.d("HC_DEBUG", "launch() call completed without throwing")
+        } catch (e: Exception) {
+            Log.e("HC_DEBUG", "launch() threw an exception", e)
+            Toast.makeText(
+                requireContext(),
+                "Ошибка запуска Health Connect: ${e.javaClass.simpleName}: ${e.message}",
                 Toast.LENGTH_LONG
             ).show()
         }
@@ -160,6 +178,7 @@ class ProfileFragment : Fragment() {
         hcViewModel.checkStatus()
 
         hcViewModel.hcState.observe(viewLifecycleOwner) { state ->
+            Log.d("HC_DEBUG", "State changed to: $state")
             pbHc.visibility = View.GONE
             when (state) {
                 is HcState.NotAvailable -> {
@@ -173,12 +192,8 @@ class ProfileFragment : Fragment() {
                     btnHcImport.isEnabled = true
                     btnHcExport.text = "Дать разрешения"
                     btnHcImport.text = "Дать разрешения"
-                    btnHcExport.setOnClickListener {
-                        requestHcPermissions.launch(HealthConnectManager.PERMISSIONS)
-                    }
-                    btnHcImport.setOnClickListener {
-                        requestHcPermissions.launch(HealthConnectManager.PERMISSIONS)
-                    }
+                    btnHcExport.setOnClickListener { launchHcPermissionRequest() }
+                    btnHcImport.setOnClickListener { launchHcPermissionRequest() }
                 }
                 is HcState.Idle -> {
                     tvHcStatus.text = "✅ Health Connect подключён и готов к работе"

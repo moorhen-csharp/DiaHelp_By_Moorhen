@@ -2,14 +2,16 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Уведомления (Android 13+) -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
-    <!-- Health Connect (заготовка для будущей интеграции) -->
     <uses-permission android:name="android.permission.health.READ_BLOOD_GLUCOSE" />
     <uses-permission android:name="android.permission.health.WRITE_BLOOD_GLUCOSE" />
     <uses-permission android:name="android.permission.health.READ_INSULIN_DELIVERY" tools:ignore="ManifestOrder" />
     <uses-permission android:name="android.permission.health.WRITE_INSULIN_DELIVERY" tools:ignore="ManifestOrder" />
+
+    <queries>
+        <package android:name="com.google.android.apps.healthdata" />
+    </queries>
 
     <application
         android:allowBackup="true"
@@ -25,7 +27,6 @@
             android:name=".view.activity.MainActivity"
             android:exported="true">
 
-            <!-- Health Connect: разрешает приложению быть выбранным в "Permissions rationale" -->
             <intent-filter>
                 <action android:name="androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE" />
             </intent-filter>
@@ -46,7 +47,6 @@
 
         </activity>
 
-        <!-- FileProvider для экспорта CSV/PDF отчётов -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
@@ -57,13 +57,23 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <!-- Health Connect: страница с описанием использования прав (заготовка) -->
         <activity-alias
             android:name=".PermissionsRationaleActivity"
             android:exported="true"
             android:targetActivity=".view.activity.MainActivity">
             <intent-filter>
                 <action android:name="androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE" />
+            </intent-filter>
+        </activity-alias>
+
+        <activity-alias
+            android:name="ViewPermissionUsageActivity"
+            android:exported="true"
+            android:targetActivity=".view.activity.MainActivity"
+            android:permission="android.permission.START_VIEW_PERMISSION_USAGE">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW_PERMISSION_USAGE" />
+                <category android:name="android.intent.category.HEALTH_PERMISSIONS" />
             </intent-filter>
         </activity-alias>
 
