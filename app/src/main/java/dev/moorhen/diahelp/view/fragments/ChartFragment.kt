@@ -116,7 +116,7 @@ class ChartFragment : Fragment() {
             lineWidth = 2f
             circleRadius = 3f
             setDrawValues(false)
-            mode = LineDataSet.Mode.CUBIC_BEZIER
+            mode = LineDataSet.Mode.LINEAR
             valueTextColor = Color.BLACK
         }
 

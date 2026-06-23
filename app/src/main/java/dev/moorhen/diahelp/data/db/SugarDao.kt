@@ -32,4 +32,8 @@ interface SugarDao {
     // Удалить все записи конкретного пользователя (для очистки профиля)
     @Query("DELETE FROM sugar_records WHERE userId = :userId")
     suspend fun clearByUserId(userId: Int)
+
+    // Проверка существования записи с тем же временем (для защиты от дублей при импорте из Health Connect)
+    @Query("SELECT COUNT(*) FROM sugar_records WHERE userId = :userId AND Date = :date")
+    suspend fun countByUserIdAndDate(userId: Int, date: Date): Int
 }

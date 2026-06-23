@@ -99,11 +99,11 @@ class HealthConnectViewModel(application: Application) : AndroidViewModel(applic
                 val sugarRecords = HealthConnectManager.readBloodGlucose(client, userId)
                 val insulinRecords = HealthConnectManager.readInsulinDelivery(client, userId)
 
-                sugarRecords.forEach { sugarRepo.insert(it) }
+                val addedSugarCount = sugarRecords.count { sugarRepo.insertIfNotExists(it) }
                 insulinRecords.forEach { insulinRepo.insert(it) }
 
                 hcState.value = HcState.Success(
-                    "Импортировано: ${sugarRecords.size} замеров сахара, ${insulinRecords.size} доз инсулина"
+                    "Импортировано: $addedSugarCount новых замеров сахара (из ${sugarRecords.size} найденных), ${insulinRecords.size} доз инсулина"
                 )
             } catch (e: Exception) {
                 hcState.value = HcState.Error("Ошибка импорта: ${e.localizedMessage}")

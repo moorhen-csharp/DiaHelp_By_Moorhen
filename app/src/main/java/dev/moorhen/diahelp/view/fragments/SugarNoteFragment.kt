@@ -56,9 +56,6 @@ class SugarNoteFragment : Fragment() {
         val toggleGroup = view.findViewById<MaterialButtonToggleGroup>(R.id.toggleGroup)
         val btnFood = view.findViewById<MaterialButton>(R.id.btnFood)
 
-        // Меняем текст кнопки "Еда" на "Инсулин"
-        btnFood.text = "Инсулин"
-
         val streak = session.getStreak()
         updateStreakUI(streak, streakText, streakIcon)
 

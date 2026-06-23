@@ -25,6 +25,7 @@ import androidx.fragment.app.viewModels
 import com.google.android.material.button.MaterialButton
 import dev.moorhen.diahelp.R
 import dev.moorhen.diahelp.utils.HealthConnectManager
+import dev.moorhen.diahelp.utils.HcSyncScheduler
 import dev.moorhen.diahelp.view.activity.AuthorizationActivity
 import dev.moorhen.diahelp.viewmodel.HcState
 import dev.moorhen.diahelp.viewmodel.HealthConnectViewModel
@@ -54,6 +55,8 @@ class ProfileFragment : Fragment() {
         Log.d("HC_DEBUG", "Callback fired. Granted permissions: $granted")
         if (granted.containsAll(HealthConnectManager.PERMISSIONS)) {
             hcViewModel.checkStatus()
+            HcSyncScheduler.schedulePeriodicSync(requireContext())
+            HcSyncScheduler.triggerImmediateSync(requireContext())
         } else {
             Toast.makeText(
                 requireContext(),
@@ -203,6 +206,8 @@ class ProfileFragment : Fragment() {
                     btnHcImport.text = "Импорт из HC"
                     btnHcExport.setOnClickListener { hcViewModel.exportToHealthConnect() }
                     btnHcImport.setOnClickListener { hcViewModel.importFromHealthConnect() }
+                    // Разрешения есть — держим фоновую синхронизацию запущенной
+                    HcSyncScheduler.schedulePeriodicSync(requireContext())
                 }
                 is HcState.Loading -> {
                     tvHcStatus.text = "⏳ Синхронизация…"

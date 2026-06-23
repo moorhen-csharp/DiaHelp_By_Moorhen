@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="background_theme">#000000</color>
     <color name="tab_selected">#FF8C00</color>
     <color name="tab_unselected">#808080</color>
     <color name="color_text">#FFFFFF</color>

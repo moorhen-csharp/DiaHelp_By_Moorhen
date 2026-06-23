@@ -31,6 +31,10 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_main)
 
+        // Если разрешения Health Connect уже выданы ранее — держим фоновую
+        // синхронизацию запущенной (WorkManager сам не создаст дубликат задачи).
+        dev.moorhen.diahelp.utils.HcSyncScheduler.schedulePeriodicSync(this)
+
         bottomNav = findViewById(R.id.bottomNavigationView)
 
         if (savedInstanceState == null) {

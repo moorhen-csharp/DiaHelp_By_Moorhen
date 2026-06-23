@@ -9,6 +9,7 @@ import dev.moorhen.diahelp.data.model.InsulinModel
 import dev.moorhen.diahelp.data.model.SugarModel
 import dev.moorhen.diahelp.data.repository.InsulinRepository
 import dev.moorhen.diahelp.data.repository.SugarRepository
+import dev.moorhen.diahelp.utils.HealthConnectManager
 import dev.moorhen.diahelp.utils.SessionManager
 import kotlinx.coroutines.launch
 import java.util.*
@@ -39,6 +40,11 @@ class SugarEntryViewModel(
 //            Toast.makeText(ctx, "Пользователь не авторизован", Toast.LENGTH_SHORT).show()
 //            return false
 //        }
+
+        if (sugarLevel!! >= 50){
+            Toast.makeText(ctx, "Глюкоза в крови должна быть <= 50", Toast.LENGTH_SHORT).show()
+            return false
+        }
 
         if (selectedSugarType == null) {
             Toast.makeText(ctx, "Выберите тип измерения", Toast.LENGTH_SHORT).show()
@@ -74,6 +80,19 @@ class SugarEntryViewModel(
         viewModelScope.launch {
             sugarRepository.insert(note)
             insulinRepository.insert(insulinNote)
+
+            // Авто-экспорт в Health Connect, если HC доступен и разрешения уже выданы.
+            // Best-effort: при отсутствии HC/разрешений/ошибке просто пропускаем —
+            // запись всё равно надёжно сохранена локально, а фоновый HcSyncWorker
+            // подхватит её при следующей синхронизации.
+            try {
+                val client = HealthConnectManager.getClientOrNull(ctx)
+                if (client != null && HealthConnectManager.hasAllPermissions(client)) {
+                    HealthConnectManager.writeSugarNotes(client, listOf(note))
+                }
+            } catch (_: Exception) {
+                // молча игнорируем — синхронизация не критична для сохранения записи
+            }
         }
 
         return true

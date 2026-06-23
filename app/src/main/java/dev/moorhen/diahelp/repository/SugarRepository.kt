@@ -27,6 +27,21 @@ class SugarRepository(context: Context) {
     suspend fun getNotesByPeriod(userId: Int, startDate: Date, endDate: Date) =
         dao.getByPeriod(userId, startDate, endDate)
 
+    /**
+     * Вставляет запись, только если для этого userId+Date ещё нет записи в БД.
+     * Используется при импорте из Health Connect, чтобы не плодить дубли
+     * при повторных запусках синхронизации.
+     * Возвращает true, если запись была реально добавлена.
+     */
+    suspend fun insertIfNotExists(note: SugarModel): Boolean {
+        val exists = dao.countByUserIdAndDate(note.userId, note.Date) > 0
+        if (!exists) {
+            dao.insert(note)
+            return true
+        }
+        return false
+    }
+
     // Возвращает пары (время в мс, уровень сахара) для построения графика.
     // Записи "не измерял" (SugarLevel == -1.0) исключаются.
     suspend fun getAllSugarDataWithDates(userId: Int): List<Pair<Long, Double>> {
