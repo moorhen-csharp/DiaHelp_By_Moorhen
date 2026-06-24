@@ -16,6 +16,9 @@ class ChartViewModel(application: Application) : AndroidViewModel(application) {
     private val insulinRepository = InsulinRepository(application)
     private val sessionManager = SessionManager(application)
 
+
+    val average = MutableLiveData<Double>()
+
     // (timestamp в мс, значение)
     val sugarData = MutableLiveData<List<Pair<Long, Double>>>()
     val insulinData = MutableLiveData<List<Pair<Long, Double>>>()
@@ -30,11 +33,13 @@ class ChartViewModel(application: Application) : AndroidViewModel(application) {
 
     init {
         loadData()
+        calculateAverageForSugar()
     }
 
     fun setPeriod(period: String) {
         selectedPeriod.value = period
         loadData()
+        calculateAverageForSugar()
     }
 
     fun toggleMode(showSugar: Boolean) {
@@ -60,6 +65,23 @@ class ChartViewModel(application: Application) : AndroidViewModel(application) {
             sugarData.postValue(sugar)
             insulinData.postValue(insulin)
             isEmpty.postValue(sugar.isEmpty() && insulin.isEmpty())
+        }
+    }
+
+    fun calculateAverageForSugar() {
+        val userId = sessionManager.getUserId()
+        if (userId == -1) {
+            average.postValue(0.0)
+            return
+        }
+
+        viewModelScope.launch {
+            val endDate = Date()
+            val startDate = getStartDateForPeriod(selectedPeriod.value ?: "1 Неделя")
+            val notes = sugarRepository.getNotesByPeriod(userId, startDate, endDate)
+            val valid = notes.filter { it.SugarLevel != -1.0 }
+            val avg = if (valid.isNotEmpty()) valid.map { it.SugarLevel }.average() else 0.0
+            average.postValue(avg)
         }
     }
 

@@ -1,51 +1,18 @@
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
-
-    <!-- Выбор периода -->
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/chartPeriodDropdownLayout"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="10dp"
-        android:layout_marginTop="10dp"
-        app:boxCornerRadiusBottomEnd="25dp"
-        app:boxCornerRadiusBottomStart="25dp"
-        app:boxCornerRadiusTopEnd="25dp"
-        app:boxCornerRadiusTopStart="25dp"
-        app:boxStrokeColor="@color/color_TextInputLayout"
-        app:hintTextColor="@color/color_TextInputLayout"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <AutoCompleteTextView
-            android:id="@+id/chartPeriodDropdown"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@android:color/transparent"
-            android:hint="Выберите период"
-            android:inputType="none"
-            android:textColor="@color/color_TextInputLayout"
-            android:textColorHint="@color/color_TextInputLayout" />
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" android:layout_width="match_parent" android:layout_height="match_parent" android:fitsSystemWindows="true">
+    <!--  Выбор периода  -->
+    <com.google.android.material.textfield.TextInputLayout android:id="@+id/chartPeriodDropdownLayout" style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginHorizontal="10dp" android:layout_marginTop="10dp" app:boxCornerRadiusBottomEnd="25dp" app:boxCornerRadiusBottomStart="25dp" app:boxCornerRadiusTopEnd="25dp" app:boxCornerRadiusTopStart="25dp" app:boxStrokeColor="@color/color_TextInputLayout" app:hintTextColor="@color/color_TextInputLayout" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent">
+        <AutoCompleteTextView android:id="@+id/chartPeriodDropdown" android:layout_width="match_parent" android:layout_height="wrap_content" android:backgroundTint="@android:color/transparent" android:hint="Выберите период" android:inputType="none" android:textColor="@color/color_TextInputLayout" android:textColorHint="@color/color_TextInputLayout"/>
     </com.google.android.material.textfield.TextInputLayout>
-
-    <!-- Переключатель Сахар / Инсулин -->
+    <!--  Переключатель Сахар / Инсулин  -->
     <com.google.android.material.button.MaterialButtonToggleGroup
         android:id="@+id/chartToggleGroup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
         app:checkedButton="@id/btnChartSugar"
+        android:layout_marginTop="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/chartPeriodDropdownLayout"
+        app:layout_constraintTop_toBottomOf="@+id/chartView"
         app:selectionRequired="true"
         app:singleSelection="true">
 
@@ -66,31 +33,89 @@
             android:checkable="true"
             android:text="Инсулин" />
     </com.google.android.material.button.MaterialButtonToggleGroup>
-
-    <!-- График -->
-    <com.github.mikephil.charting.charts.LineChart
-        android:id="@+id/lineChart"
+    <!--  График Vico  -->
+    <com.patrykandpatrick.vico.views.chart.ChartView
+        android:id="@+id/chartView"
         android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_height="150dp"
         android:layout_margin="10dp"
-        android:backgroundTint="@color/background_theme"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:chart="line"
+        app:lineChartStyle="@color/color_chart"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/chartToggleGroup" />
-
-    <!-- Сообщение, если данных нет -->
+        app:layout_constraintTop_toBottomOf="@+id/chartPeriodDropdownLayout"
+        app:showBottomAxis="true"
+        app:showStartAxis="true" />
+    <!--  Сообщение, если данных нет  -->
     <TextView
         android:id="@+id/tvNoChartData"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Нет данных для отображения"
         android:textSize="16sp"
-        android:textColor="@color/white"
+        android:textColor="@color/color_text"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@id/lineChart"
-        app:layout_constraintEnd_toEndOf="@id/lineChart"
-        app:layout_constraintStart_toStartOf="@id/lineChart"
-        app:layout_constraintTop_toTopOf="@id/lineChart" />
+        app:layout_constraintBottom_toBottomOf="@id/chartView"
+        app:layout_constraintEnd_toEndOf="@id/chartView"
+        app:layout_constraintStart_toStartOf="@id/chartView"
+        app:layout_constraintTop_toTopOf="@id/chartView"/>
 
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:text="Максимальный показатель:"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/chartToggleGroup" />
+
+    <TextView
+        android:id="@+id/tvMaxValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="10"
+        android:layout_marginEnd="100dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/chartToggleGroup" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:text="Минимальный показатель:"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+    <TextView
+        android:id="@+id/tvMinValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="100dp"
+        android:text="10"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvMaxValue" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:text="Среднее значение:"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView2" />
+
+    <TextView
+        android:id="@+id/tvAvgValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="100dp"
+        android:layout_marginTop="20dp"
+        android:text="10"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvMinValue" />
 </androidx.constraintlayout.widget.ConstraintLayout>

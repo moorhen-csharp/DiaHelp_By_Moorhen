@@ -1,6 +1,6 @@
 package dev.moorhen.diahelp.view.fragments
 
-import android.graphics.Color
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,24 +8,23 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.github.mikephil.charting.charts.LineChart
-import com.github.mikephil.charting.components.XAxis
-import com.github.mikephil.charting.data.Entry
-import com.github.mikephil.charting.data.LineData
-import com.github.mikephil.charting.data.LineDataSet
-import com.github.mikephil.charting.formatter.ValueFormatter
 import com.google.android.material.button.MaterialButtonToggleGroup
+import com.patrykandpatrick.vico.core.chart.line.LineChart
+import com.patrykandpatrick.vico.core.component.shape.ShapeComponent
+import com.patrykandpatrick.vico.core.component.shape.Shapes
+import com.patrykandpatrick.vico.core.entry.ChartEntryModelProducer
+import com.patrykandpatrick.vico.core.entry.FloatEntry
+import com.patrykandpatrick.vico.views.chart.ChartView
 import dev.moorhen.diahelp.R
 import dev.moorhen.diahelp.viewmodel.ChartViewModel
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 class ChartFragment : Fragment() {
 
     private val viewModel: ChartViewModel by viewModels()
+    private val producer = ChartEntryModelProducer()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -34,12 +33,16 @@ class ChartFragment : Fragment() {
     ): View {
         val view = inflater.inflate(R.layout.fragment_chart, container, false)
 
-        val lineChart = view.findViewById<LineChart>(R.id.lineChart)
-        val noDataText = view.findViewById<TextView>(R.id.tvNoChartData)
-        val dropdown = view.findViewById<AutoCompleteTextView>(R.id.chartPeriodDropdown)
+        val chartView   = view.findViewById<ChartView>(R.id.chartView)
+        val noDataText  = view.findViewById<TextView>(R.id.tvNoChartData)
+        val dropdown    = view.findViewById<AutoCompleteTextView>(R.id.chartPeriodDropdown)
         val toggleGroup = view.findViewById<MaterialButtonToggleGroup>(R.id.chartToggleGroup)
+        val maxValue = view.findViewById<TextView>(R.id.tvMaxValue)
+        val minValue = view.findViewById<TextView>(R.id.tvMinValue)
+        var avgValue = view.findViewById<TextView>(R.id.tvAvgValue)
 
-        setupChartAppearance(lineChart)
+        chartView.entryProducer = producer
+        applyChartStyle(chartView)
 
         val periods = listOf("1 День", "1 Неделя", "1 Месяц", "3 Месяца", "6 Месяцев", "1 Год")
         val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, periods)
@@ -53,15 +56,20 @@ class ChartFragment : Fragment() {
         toggleGroup.addOnButtonCheckedListener { _, checkedId, isChecked ->
             if (isChecked) {
                 when (checkedId) {
-                    R.id.btnChartSugar -> viewModel.toggleMode(true)
+                    R.id.btnChartSugar   -> viewModel.toggleMode(true)
                     R.id.btnChartInsulin -> viewModel.toggleMode(false)
                 }
-                updateChart(lineChart, noDataText)
+                updateChart(chartView, noDataText)
+                applyChartStyle(chartView)
             }
         }
 
-        viewModel.sugarData.observe(viewLifecycleOwner) { updateChart(lineChart, noDataText) }
-        viewModel.insulinData.observe(viewLifecycleOwner) { updateChart(lineChart, noDataText) }
+        viewModel.sugarData.observe(viewLifecycleOwner)   { updateChart(chartView, noDataText) }
+        viewModel.insulinData.observe(viewLifecycleOwner) { updateChart(chartView, noDataText) }
+
+        viewModel.average.observe(viewLifecycleOwner) { avg ->
+                avgValue.text = String.format("%.1f ммоль/л", avg)
+        }
 
         return view
     }
@@ -71,56 +79,65 @@ class ChartFragment : Fragment() {
         viewModel.loadData()
     }
 
-    private fun setupChartAppearance(lineChart: LineChart) {
-        lineChart.description.isEnabled = false
-        lineChart.setTouchEnabled(true)
-        lineChart.isDragEnabled = true
-        lineChart.setScaleEnabled(true)
-        lineChart.setPinchZoom(true)
-        lineChart.axisRight.isEnabled = false
 
-        val xAxis = lineChart.xAxis
-        xAxis.position = XAxis.XAxisPosition.BOTTOM
-        xAxis.granularity = 1f
-        xAxis.valueFormatter = object : ValueFormatter() {
-            private val sdf = SimpleDateFormat("dd.MM HH:mm", Locale.getDefault())
-            override fun getFormattedValue(value: Float): String {
-                return sdf.format(Date(value.toLong()))
-            }
-        }
+    /**
+     * Задаём стиль графика программно через LineChart.LineSpec:
+     * - цвет линии зависит от режима (сахар = синий, инсулин = зелёный)
+     * - полупрозрачная заливка под линией
+     * - круглые точки на каждом замере
+     * - толщина линии 2.5dp
+     */
+    private fun applyChartStyle(chartView: ChartView) {
+        val isSugar  = viewModel.isSugarMode.value ?: true
+        val colorRes = if (isSugar) R.color.color_chart else R.color.color_chart
+        val lineColor = ContextCompat.getColor(requireContext(), colorRes)
+
+        // Заливка под линией — тот же цвет, но с alpha ~24%
+        val fillColor = (lineColor and 0x00FFFFFF) or (60 shl 24)
+
+        chartView.chart = LineChart(
+            lines = listOf(
+                LineChart.LineSpec(
+                    lineColor          = lineColor,
+                    lineThicknessDp    = 2.5f,
+                    point              = ShapeComponent(
+                        shape = Shapes.pillShape,
+                        color = lineColor,
+                    ),
+                    pointSizeDp        = 8f,
+                )
+            )
+        )
+//        chartView.chart = ColumnChart(
+//            columns = listOf(
+//                LineComponent(
+//                    color = lineColor,
+//                    thicknessDp = 10f,
+//                    shape = Shapes.pillShape,
+//                )
+//            )
+//        )
     }
 
-    private fun updateChart(lineChart: LineChart, noDataText: TextView) {
+    private fun updateChart(chartView: ChartView, noDataText: TextView) {
         val isSugar = viewModel.isSugarMode.value ?: true
         val rawData = if (isSugar) viewModel.sugarData.value else viewModel.insulinData.value
-        val data = rawData ?: emptyList()
+        val data    = rawData ?: emptyList()
 
         if (data.isEmpty()) {
-            lineChart.clear()
-            lineChart.visibility = View.INVISIBLE
+            chartView.visibility  = View.INVISIBLE
             noDataText.visibility = View.VISIBLE
             return
         }
 
-        lineChart.visibility = View.VISIBLE
+        chartView.visibility  = View.VISIBLE
         noDataText.visibility = View.GONE
 
-        val entries = data.map { Entry(it.first.toFloat(), it.second.toFloat()) }
-
-        val label = if (isSugar) "Уровень сахара (ммоль/л)" else "Доза инсулина (ед.)"
-        val colorRes = if (isSugar) R.color.blueLow else R.color.greenNormal
-
-        val dataSet = LineDataSet(entries, label).apply {
-            color = androidx.core.content.ContextCompat.getColor(requireContext(), colorRes)
-            setCircleColor(androidx.core.content.ContextCompat.getColor(requireContext(), colorRes))
-            lineWidth = 2f
-            circleRadius = 3f
-            setDrawValues(false)
-            mode = LineDataSet.Mode.LINEAR
-            valueTextColor = Color.BLACK
+        val entries = data.mapIndexed { index, pair ->
+            FloatEntry(x = index.toFloat(), y = pair.second.toFloat())
         }
 
-        lineChart.data = LineData(dataSet)
-        lineChart.invalidate()
+        producer.setEntries(entries)
     }
+
 }

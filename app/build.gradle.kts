@@ -49,7 +49,7 @@ dependencies {
 
 
     // Графики
-    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+    implementation("com.patrykandpatrick.vico:views:1.16.0")
 
     // ViewPager2 (используется в CalculatorContainerFragment)
     implementation("androidx.viewpager2:viewpager2:1.1.0")
