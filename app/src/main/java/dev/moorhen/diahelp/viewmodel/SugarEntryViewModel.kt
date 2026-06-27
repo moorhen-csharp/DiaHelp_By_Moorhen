@@ -36,13 +36,19 @@ class SugarEntryViewModel(
         val ctx = getApplication<Application>()
         val userId = sessionManager.getUserId()
 
-//        if (userId == -1) {
-//            Toast.makeText(ctx, "Пользователь не авторизован", Toast.LENGTH_SHORT).show()
-//            return false
-//        }
+        if (userId == -1) {
+            Toast.makeText(ctx, "Пользователь не авторизован", Toast.LENGTH_SHORT).show()
+            return false
+        }
 
-        if (sugarLevel!! >= 50){
-            Toast.makeText(ctx, "Глюкоза в крови должна быть <= 50", Toast.LENGTH_SHORT).show()
+        // Проверяем null ПЕРВЫМ — иначе NPE на sugarLevel!!
+        if (!isNotMeasured && (sugarLevel == null || sugarLevel!! <= 0)) {
+            Toast.makeText(ctx, "Введите корректный уровень сахара", Toast.LENGTH_SHORT).show()
+            return false
+        }
+
+        if (!isNotMeasured && sugarLevel!! >= 50) {
+            Toast.makeText(ctx, "Глюкоза в крови должна быть ≤ 50", Toast.LENGTH_SHORT).show()
             return false
         }
 
@@ -56,14 +62,8 @@ class SugarEntryViewModel(
             return false
         }
 
-        if (!isNotMeasured && (sugarLevel == null || sugarLevel!! <= 0)) {
-            Toast.makeText(ctx, "Введите корректный уровень сахара", Toast.LENGTH_SHORT).show()
-            return false
-        }
-
-        // ✅ Создаем SugarModel с userId
         val note = SugarModel(
-            userId = userId, // <-- Добавлено
+            userId = userId,
             SugarLevel = sugarLevel ?: -1.0,
             MeasurementTime = selectedSugarType ?: "",
             HealthType = selectedHealthType ?: "",
@@ -79,20 +79,16 @@ class SugarEntryViewModel(
 
         viewModelScope.launch {
             sugarRepository.insert(note)
-            insulinRepository.insert(insulinNote)
+            if ((insulinDose ?: 0.0) > 0.0) {
+                insulinRepository.insert(insulinNote)
+            }
 
-            // Авто-экспорт в Health Connect, если HC доступен и разрешения уже выданы.
-            // Best-effort: при отсутствии HC/разрешений/ошибке просто пропускаем —
-            // запись всё равно надёжно сохранена локально, а фоновый HcSyncWorker
-            // подхватит её при следующей синхронизации.
             try {
                 val client = HealthConnectManager.getClientOrNull(ctx)
                 if (client != null && HealthConnectManager.hasAllPermissions(client)) {
                     HealthConnectManager.writeSugarNotes(client, listOf(note))
                 }
-            } catch (_: Exception) {
-                // молча игнорируем — синхронизация не критична для сохранения записи
-            }
+            } catch (_: Exception) { }
         }
 
         return true

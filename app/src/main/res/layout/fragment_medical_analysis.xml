@@ -13,7 +13,6 @@
         android:paddingTop="16dp"
         android:paddingBottom="32dp">
 
-        <!-- Заголовок -->
         <TextView
             android:id="@+id/titleText"
             android:layout_width="wrap_content"
@@ -32,7 +31,7 @@
             android:textColor="?attr/colorOnSurfaceVariant"
             android:layout_marginBottom="20dp"/>
 
-        <!-- HbA1c — главный показатель, отдельная акцентная карточка -->
+        <!-- HbA1c -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -81,44 +80,30 @@
                         android:paddingVertical="3dp"/>
                 </LinearLayout>
 
-                <LinearLayout
+                <!-- Поле без hint внутри TextInputLayout — только suffixText с единицами -->
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
+                    app:suffixText="%"
+                    app:suffixTextColor="#90CAF9"
+                    app:boxStrokeColor="#90CAF9"
+                    app:boxCornerRadiusTopStart="12dp"
+                    app:boxCornerRadiusTopEnd="12dp"
+                    app:boxCornerRadiusBottomStart="12dp"
+                    app:boxCornerRadiusBottomEnd="12dp">
 
-                    <com.google.android.material.textfield.TextInputLayout
-                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                        android:layout_width="0dp"
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/hba1cInput"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:hint="Значение"
-                        app:boxStrokeColor="#90CAF9"
-                        app:hintTextColor="#90CAF9"
-                        app:boxCornerRadiusTopStart="12dp"
-                        app:boxCornerRadiusTopEnd="12dp"
-                        app:boxCornerRadiusBottomStart="12dp"
-                        app:boxCornerRadiusBottomEnd="12dp">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/hba1cInput"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:inputType="numberDecimal"
-                            android:textColor="#FFFFFF"
-                            android:textSize="18sp"
-                            android:textAlignment="center"/>
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text=" %"
-                        android:textSize="22sp"
-                        android:textStyle="bold"
-                        android:textColor="#90CAF9"
-                        android:paddingStart="12dp"/>
-                </LinearLayout>
+                        android:inputType="numberDecimal"
+                        android:textColor="#FFFFFF"
+                        android:textSize="20sp"
+                        android:textAlignment="center"
+                        android:hint="0.0"
+                        android:textColorHint="#60FFFFFF"/>
+                </com.google.android.material.textfield.TextInputLayout>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -130,7 +115,7 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- C-пептид и Гемоглобин в одной карточке -->
+        <!-- Показатели крови -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -188,9 +173,10 @@
 
                     <com.google.android.material.textfield.TextInputLayout
                         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                        android:layout_width="110dp"
+                        android:layout_width="120dp"
                         android:layout_height="wrap_content"
-                        android:hint="нг/мл"
+                        app:suffixText="нг/мл"
+                        app:suffixTextAppearance="@style/TextAppearance.Material3.BodySmall"
                         app:boxCornerRadiusTopStart="12dp"
                         app:boxCornerRadiusTopEnd="12dp"
                         app:boxCornerRadiusBottomStart="12dp"
@@ -201,15 +187,13 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="numberDecimal"
-                            android:textAlignment="center"/>
+                            android:textAlignment="center"
+                            android:hint="0.0"/>
                     </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="?attr/colorOutline"
-                    android:layout_marginBottom="14dp"/>
+                <View android:layout_width="match_parent" android:layout_height="1dp"
+                    android:background="?attr/colorOutline" android:layout_marginBottom="14dp"/>
 
                 <!-- Гемоглобин -->
                 <LinearLayout
@@ -243,9 +227,10 @@
 
                     <com.google.android.material.textfield.TextInputLayout
                         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                        android:layout_width="110dp"
+                        android:layout_width="120dp"
                         android:layout_height="wrap_content"
-                        android:hint="г/л"
+                        app:suffixText="г/л"
+                        app:suffixTextAppearance="@style/TextAppearance.Material3.BodySmall"
                         app:boxCornerRadiusTopStart="12dp"
                         app:boxCornerRadiusTopEnd="12dp"
                         app:boxCornerRadiusBottomStart="12dp"
@@ -256,15 +241,13 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="numberDecimal"
-                            android:textAlignment="center"/>
+                            android:textAlignment="center"
+                            android:hint="0"/>
                     </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="?attr/colorOutline"
-                    android:layout_marginBottom="14dp"/>
+                <View android:layout_width="match_parent" android:layout_height="1dp"
+                    android:background="?attr/colorOutline" android:layout_marginBottom="14dp"/>
 
                 <!-- Лейкоциты -->
                 <LinearLayout
@@ -298,9 +281,10 @@
 
                     <com.google.android.material.textfield.TextInputLayout
                         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                        android:layout_width="110dp"
+                        android:layout_width="120dp"
                         android:layout_height="wrap_content"
-                        android:hint="×10⁹/л"
+                        app:suffixText="×10⁹/л"
+                        app:suffixTextAppearance="@style/TextAppearance.Material3.BodySmall"
                         app:boxCornerRadiusTopStart="12dp"
                         app:boxCornerRadiusTopEnd="12dp"
                         app:boxCornerRadiusBottomStart="12dp"
@@ -311,15 +295,13 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="numberDecimal"
-                            android:textAlignment="center"/>
+                            android:textAlignment="center"
+                            android:hint="0.0"/>
                     </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="?attr/colorOutline"
-                    android:layout_marginBottom="14dp"/>
+                <View android:layout_width="match_parent" android:layout_height="1dp"
+                    android:background="?attr/colorOutline" android:layout_marginBottom="14dp"/>
 
                 <!-- Тромбоциты -->
                 <LinearLayout
@@ -352,9 +334,10 @@
 
                     <com.google.android.material.textfield.TextInputLayout
                         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                        android:layout_width="110dp"
+                        android:layout_width="120dp"
                         android:layout_height="wrap_content"
-                        android:hint="×10⁹/л"
+                        app:suffixText="×10⁹/л"
+                        app:suffixTextAppearance="@style/TextAppearance.Material3.BodySmall"
                         app:boxCornerRadiusTopStart="12dp"
                         app:boxCornerRadiusTopEnd="12dp"
                         app:boxCornerRadiusBottomStart="12dp"
@@ -365,7 +348,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="numberDecimal"
-                            android:textAlignment="center"/>
+                            android:textAlignment="center"
+                            android:hint="0"/>
                     </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
             </LinearLayout>
@@ -397,7 +381,7 @@
                     android:textColor="?attr/colorOnSurface"
                     android:layout_marginBottom="16dp"/>
 
-                <!-- Холестерин общий -->
+                <!-- Холестерин -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -429,9 +413,10 @@
 
                     <com.google.android.material.textfield.TextInputLayout
                         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                        android:layout_width="110dp"
+                        android:layout_width="130dp"
                         android:layout_height="wrap_content"
-                        android:hint="ммоль/л"
+                        app:suffixText="ммоль/л"
+                        app:suffixTextAppearance="@style/TextAppearance.Material3.BodySmall"
                         app:boxCornerRadiusTopStart="12dp"
                         app:boxCornerRadiusTopEnd="12dp"
                         app:boxCornerRadiusBottomStart="12dp"
@@ -442,7 +427,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="numberDecimal"
-                            android:textAlignment="center"/>
+                            android:textAlignment="center"
+                            android:hint="0.0"/>
                     </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
 
@@ -481,9 +467,10 @@
 
                     <com.google.android.material.textfield.TextInputLayout
                         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                        android:layout_width="110dp"
+                        android:layout_width="130dp"
                         android:layout_height="wrap_content"
-                        android:hint="ммоль/л"
+                        app:suffixText="ммоль/л"
+                        app:suffixTextAppearance="@style/TextAppearance.Material3.BodySmall"
                         app:boxCornerRadiusTopStart="12dp"
                         app:boxCornerRadiusTopEnd="12dp"
                         app:boxCornerRadiusBottomStart="12dp"
@@ -494,7 +481,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="numberDecimal"
-                            android:textAlignment="center"/>
+                            android:textAlignment="center"
+                            android:hint="0.0"/>
                     </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
 
@@ -533,9 +521,10 @@
 
                     <com.google.android.material.textfield.TextInputLayout
                         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                        android:layout_width="110dp"
+                        android:layout_width="130dp"
                         android:layout_height="wrap_content"
-                        android:hint="ммоль/л"
+                        app:suffixText="ммоль/л"
+                        app:suffixTextAppearance="@style/TextAppearance.Material3.BodySmall"
                         app:boxCornerRadiusTopStart="12dp"
                         app:boxCornerRadiusTopEnd="12dp"
                         app:boxCornerRadiusBottomStart="12dp"
@@ -546,7 +535,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="numberDecimal"
-                            android:textAlignment="center"/>
+                            android:textAlignment="center"
+                            android:hint="0.0"/>
                     </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
 
@@ -584,9 +574,10 @@
 
                     <com.google.android.material.textfield.TextInputLayout
                         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                        android:layout_width="110dp"
+                        android:layout_width="130dp"
                         android:layout_height="wrap_content"
-                        android:hint="ммоль/л"
+                        app:suffixText="ммоль/л"
+                        app:suffixTextAppearance="@style/TextAppearance.Material3.BodySmall"
                         app:boxCornerRadiusTopStart="12dp"
                         app:boxCornerRadiusTopEnd="12dp"
                         app:boxCornerRadiusBottomStart="12dp"
@@ -597,7 +588,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="numberDecimal"
-                            android:textAlignment="center"/>
+                            android:textAlignment="center"
+                            android:hint="0.0"/>
                     </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
             </LinearLayout>
@@ -661,9 +653,10 @@
 
                     <com.google.android.material.textfield.TextInputLayout
                         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                        android:layout_width="110dp"
+                        android:layout_width="140dp"
                         android:layout_height="wrap_content"
-                        android:hint="мкмоль/л"
+                        app:suffixText="мкмоль/л"
+                        app:suffixTextAppearance="@style/TextAppearance.Material3.BodySmall"
                         app:boxCornerRadiusTopStart="12dp"
                         app:boxCornerRadiusTopEnd="12dp"
                         app:boxCornerRadiusBottomStart="12dp"
@@ -674,7 +667,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="numberDecimal"
-                            android:textAlignment="center"/>
+                            android:textAlignment="center"
+                            android:hint="0"/>
                     </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
 
@@ -713,9 +707,10 @@
 
                     <com.google.android.material.textfield.TextInputLayout
                         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                        android:layout_width="110dp"
+                        android:layout_width="130dp"
                         android:layout_height="wrap_content"
-                        android:hint="ммоль/л"
+                        app:suffixText="ммоль/л"
+                        app:suffixTextAppearance="@style/TextAppearance.Material3.BodySmall"
                         app:boxCornerRadiusTopStart="12dp"
                         app:boxCornerRadiusTopEnd="12dp"
                         app:boxCornerRadiusBottomStart="12dp"
@@ -726,7 +721,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="numberDecimal"
-                            android:textAlignment="center"/>
+                            android:textAlignment="center"
+                            android:hint="0.0"/>
                     </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
 
@@ -765,9 +761,10 @@
 
                     <com.google.android.material.textfield.TextInputLayout
                         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                        android:layout_width="110dp"
+                        android:layout_width="120dp"
                         android:layout_height="wrap_content"
-                        android:hint="Ед/л"
+                        app:suffixText="Ед/л"
+                        app:suffixTextAppearance="@style/TextAppearance.Material3.BodySmall"
                         app:boxCornerRadiusTopStart="12dp"
                         app:boxCornerRadiusTopEnd="12dp"
                         app:boxCornerRadiusBottomStart="12dp"
@@ -778,7 +775,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="numberDecimal"
-                            android:textAlignment="center"/>
+                            android:textAlignment="center"
+                            android:hint="0"/>
                     </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
 
@@ -816,9 +814,10 @@
 
                     <com.google.android.material.textfield.TextInputLayout
                         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                        android:layout_width="110dp"
+                        android:layout_width="120dp"
                         android:layout_height="wrap_content"
-                        android:hint="Ед/л"
+                        app:suffixText="Ед/л"
+                        app:suffixTextAppearance="@style/TextAppearance.Material3.BodySmall"
                         app:boxCornerRadiusTopStart="12dp"
                         app:boxCornerRadiusTopEnd="12dp"
                         app:boxCornerRadiusBottomStart="12dp"
@@ -829,7 +828,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="numberDecimal"
-                            android:textAlignment="center"/>
+                            android:textAlignment="center"
+                            android:hint="0"/>
                     </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
             </LinearLayout>

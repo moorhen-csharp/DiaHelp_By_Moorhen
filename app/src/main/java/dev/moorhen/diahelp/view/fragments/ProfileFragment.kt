@@ -233,6 +233,21 @@ class ProfileFragment : Fragment() {
                     Toast.makeText(requireContext(), state.message, Toast.LENGTH_LONG).show()
                     hcViewModel.resetState()
                 }
+                is HcState.SessionExpired -> {
+                    // userId в SharedPreferences не соответствует ни одному пользователю в БД
+                    // (например, после переустановки или fallbackToDestructiveMigration).
+                    // Единственное решение — выйти и войти заново.
+                    tvHcStatus.text = "⚠️ Сессия устарела — войдите в аккаунт заново"
+                    btnHcExport.isEnabled = false
+                    btnHcImport.isEnabled = false
+                    Toast.makeText(
+                        requireContext(),
+                        "Сессия устарела. Пожалуйста, войдите в аккаунт заново.",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    startActivity(Intent(requireContext(), AuthorizationActivity::class.java))
+                    requireActivity().finish()
+                }
             }
         }
 

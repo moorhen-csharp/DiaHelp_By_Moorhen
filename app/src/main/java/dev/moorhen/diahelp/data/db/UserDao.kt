@@ -25,6 +25,10 @@ interface UserDao {
     @Query("SELECT * FROM users WHERE id = :id LIMIT 1")
     fun getUserById(id: Int): LiveData<UserModel>
 
+    // Suspend-версия для проверки существования пользователя в корутинах
+    @Query("SELECT * FROM users WHERE id = :id LIMIT 1")
+    suspend fun getUserByIdSuspend(id: Int): UserModel?
+
     @Query("SELECT * FROM users ORDER BY id ASC")
     fun getAllUsers(): LiveData<List<UserModel>>
 }
