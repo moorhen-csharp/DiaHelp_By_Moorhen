@@ -2,12 +2,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-
-    <uses-permission android:name="android.permission.health.READ_BLOOD_GLUCOSE" />
-    <uses-permission android:name="android.permission.health.WRITE_BLOOD_GLUCOSE" />
-    <uses-permission android:name="android.permission.health.READ_INSULIN_DELIVERY" tools:ignore="ManifestOrder" />
-    <uses-permission android:name="android.permission.health.WRITE_INSULIN_DELIVERY" tools:ignore="ManifestOrder" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.health.READ_BLOOD_GLUCOSE"/>
+    <uses-permission android:name="android.permission.health.WRITE_BLOOD_GLUCOSE"/>
+    <uses-permission android:name="android.permission.health.READ_HBA1C"/>
+    <uses-permission android:name="android.permission.health.WRITE_HBA1C"/>
+    <uses-permission android:name="android.permission.health.READ_INSULIN_DELIVERY" tools:ignore="ManifestOrder"/>
+    <uses-permission android:name="android.permission.health.WRITE_INSULIN_DELIVERY" tools:ignore="ManifestOrder"/>
 
     <queries>
         <package android:name="com.google.android.apps.healthdata" />

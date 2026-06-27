@@ -14,24 +14,31 @@ import java.util.concurrent.TimeUnit
  * WorkManager не позволяет периодическим задачам выполняться чаще,
  * чем раз в 15 минут — используем 4 часа как разумный компромисс
  * между свежестью данных и расходом батареи.
+ *
+ * ВАЖНО: используем ExistingPeriodicWorkPolicy.UPDATE вместо KEEP,
+ * чтобы worker не «зависал» после нескольких дней работы.
+ * UPDATE обновляет расписание при каждом запуске приложения,
+ * сохраняя при этом счётчик повторов и статус.
  */
 object HcSyncScheduler {
 
     private const val SYNC_INTERVAL_HOURS = 4L
 
-    /** Запускает периодическую синхронизацию с Health Connect (если ещё не запущена). */
+    /** Запускает или обновляет периодическую синхронизацию с Health Connect. */
     fun schedulePeriodicSync(context: Context) {
         val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.NOT_REQUIRED) // HC работает локально на устройстве
+            .setRequiredNetworkType(NetworkType.NOT_REQUIRED)
             .build()
 
         val request = PeriodicWorkRequestBuilder<HcSyncWorker>(SYNC_INTERVAL_HOURS, TimeUnit.HOURS)
             .setConstraints(constraints)
             .build()
 
+        // UPDATE вместо KEEP: обновляет worker при каждом старте приложения,
+        // исправляет зависание после 2–3 дней без перезапуска
         WorkManager.getInstance(context).enqueueUniquePeriodicWork(
             HcSyncWorker.WORK_NAME,
-            ExistingPeriodicWorkPolicy.KEEP, // не перезапускаем, если уже запланирована
+            ExistingPeriodicWorkPolicy.UPDATE,
             request
         )
     }

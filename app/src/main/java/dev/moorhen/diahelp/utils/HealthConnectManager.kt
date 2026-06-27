@@ -5,10 +5,12 @@ import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.PermissionController
 import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.BloodGlucoseRecord
+//import androidx.health.connect.client.records.Hba1cRecord
 import androidx.health.connect.client.records.metadata.Metadata
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter
 import androidx.health.connect.client.units.BloodGlucose
+import androidx.health.connect.client.units.Percentage
 import dev.moorhen.diahelp.data.model.InsulinModel
 import dev.moorhen.diahelp.data.model.SugarModel
 import java.time.Instant
@@ -20,6 +22,8 @@ object HealthConnectManager {
     val PERMISSIONS = setOf(
         HealthPermission.getReadPermission(BloodGlucoseRecord::class),
         HealthPermission.getWritePermission(BloodGlucoseRecord::class),
+//        HealthPermission.getReadPermission(Hba1cRecord::class),
+//        HealthPermission.getWritePermission(Hba1cRecord::class),
     )
 
     fun isAvailable(context: Context): Boolean =
@@ -59,6 +63,17 @@ object HealthConnectManager {
         client: HealthConnectClient,
         notes: List<InsulinModel>
     ): Int = 0
+
+//    suspend fun writeHba1c(client: HealthConnectClient, hba1cPercent: Double) {
+//        val now = Instant.now()
+//        val record = Hba1cRecord(
+//            time = now,
+//            zoneOffset = ZoneOffset.systemDefault().rules.getOffset(now),
+//            percentage = Percentage(hba1cPercent),
+//            metadata = Metadata.manualEntry()
+//        )
+//        client.insertRecords(listOf(record))
+//    }
 
     suspend fun readBloodGlucose(
         client: HealthConnectClient,

@@ -44,11 +44,14 @@ class CorrectionViewModel(application: Application) : AndroidViewModel(applicati
             }
 
             val coeffInsulin = user?.coeffInsulin?.takeIf { it > 0 } ?: 2.0
-            val correction = (currentGlucose - targetGlucose) / coeffInsulin
-            val finalValue = if (correction < 0) 0.0 else correction
+            val rawCorrection = (currentGlucose - targetGlucose) / coeffInsulin
+            // Округляем до 1 знака, чтобы избежать ошибок Double (например, 6.300000000000001)
+            val finalValue = if (rawCorrection < 0) 0.0
+            else Math.round(rawCorrection * 10.0) / 10.0
 
             _correctionResult.postValue("%.1f".format(finalValue))
             _showDialog.postValue(Pair(currentGlucose, finalValue))
+
         }
     }
 

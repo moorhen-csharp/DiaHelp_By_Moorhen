@@ -33,6 +33,22 @@ class InsulinEntryFragment : Fragment() {
 
         val insulinInput = view.findViewById<TextInputEditText>(R.id.inputInsulinDose)
         val btnSave = view.findViewById<MaterialButton>(R.id.btnSave)
+        val btnPlus = view.findViewById<MaterialButton>(R.id.btnPlus)
+        val btnMinus = view.findViewById<MaterialButton>(R.id.btnMinus)
+
+        btnPlus.setOnClickListener {
+            val current = insulinInput.text.toString().toDoubleOrNull() ?: 0.0
+            val next = Math.round((current + 1.0) * 10.0) / 10.0
+            insulinInput.setText(if (next == next.toLong().toDouble()) next.toLong().toString() else next.toString())
+        }
+
+        btnMinus.setOnClickListener {
+            val current = insulinInput.text.toString().toDoubleOrNull() ?: 0.0
+            val next = Math.round((current - 1.0) * 10.0) / 10.0
+            if (next >= 0) {
+                insulinInput.setText(if (next == next.toLong().toDouble()) next.toLong().toString() else next.toString())
+            }
+        }
 
         btnSave.setOnClickListener {
             viewModel.insulinDose = insulinInput.text.toString().toDoubleOrNull()
