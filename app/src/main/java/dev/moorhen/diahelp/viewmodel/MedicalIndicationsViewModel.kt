@@ -7,8 +7,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import dev.moorhen.diahelp.data.model.MedicalAnalysisModel
-import dev.moorhen.diahelp.data.repository.MedicalAnalysisRepository
-import dev.moorhen.diahelp.utils.HealthConnectManager
+import dev.moorhen.diahelp.repository.MedicalAnalysisRepository
 import dev.moorhen.diahelp.utils.SessionManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -19,8 +18,8 @@ class MedicalIndicationsViewModel(application: Application) : AndroidViewModel(a
     private val repository = MedicalAnalysisRepository(application)
     private val sessionManager = SessionManager(application)
 
-    private val _saveSuccess = MutableLiveData<Boolean>()
-    val saveSuccess: LiveData<Boolean> = _saveSuccess
+    private val _saveSuccess = MutableLiveData<Boolean?>()
+    val saveSuccess: LiveData<Boolean?> = _saveSuccess
 
     private val _latestRecord = MutableLiveData<MedicalAnalysisModel?>()
     val latestRecord: LiveData<MedicalAnalysisModel?> = _latestRecord
@@ -28,7 +27,10 @@ class MedicalIndicationsViewModel(application: Application) : AndroidViewModel(a
     fun loadLatest(type: String) {
         viewModelScope.launch {
             val userId = sessionManager.getUserId()
-            if (userId == -1) return@launch
+            if (userId == -1) {
+                _latestRecord.postValue(null)
+                return@launch
+            }
             val record = withContext(Dispatchers.IO) {
                 repository.getLatestByType(userId, type)
             }
@@ -52,10 +54,10 @@ class MedicalIndicationsViewModel(application: Application) : AndroidViewModel(a
         alt: Double? = null,
         ast: Double? = null
     ) {
-        val context = getApplication<Application>().applicationContext
+        val ctx = getApplication<Application>().applicationContext
         val userId = sessionManager.getUserId()
         if (userId == -1) {
-            Toast.makeText(context, "Ошибка: пользователь не авторизован", Toast.LENGTH_SHORT).show()
+            Toast.makeText(ctx, "Ошибка: пользователь не авторизован", Toast.LENGTH_SHORT).show()
             _saveSuccess.postValue(false)
             return
         }
@@ -80,30 +82,19 @@ class MedicalIndicationsViewModel(application: Application) : AndroidViewModel(a
 
         viewModelScope.launch {
             try {
-                val id = withContext(Dispatchers.IO) { repository.save(record) }
-
-                // Пытаемся синхронизировать HbA1c в Health Connect
-//                if (hba1c != null) {
-//                    syncHba1cToHc(id.toInt(), hba1c)
-//                }
-
+                withContext(Dispatchers.IO) { repository.save(record) }
                 _saveSuccess.postValue(true)
+                // После сохранения сразу обновляем отображение
+                loadLatest(type)
             } catch (e: Exception) {
-                Toast.makeText(context, "Ошибка сохранения: ${e.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(ctx, "Ошибка сохранения: ${e.message}", Toast.LENGTH_SHORT).show()
                 _saveSuccess.postValue(false)
             }
         }
     }
 
-//    private suspend fun syncHba1cToHc(recordId: Int, hba1c: Double) {
-//        val context = getApplication<Application>().applicationContext
-//        try {
-//            val client = HealthConnectManager.getClientOrNull(context) ?: return
-//            if (!HealthConnectManager.hasAllPermissions(client)) return
-////            HealthConnectManager.writeHba1c(client, hba1c)
-//            repository.markSynced(recordId)
-//        } catch (_: Exception) {
-//            // Запись останется с syncedToHc=false — синхронизируется при следующем фоновом worker'е
-//        }
-//    }
+    /** Сбрасываем флаг после обработки чтобы не срабатывал повторно */
+    fun resetSaveSuccess() {
+        _saveSuccess.value = null
+    }
 }

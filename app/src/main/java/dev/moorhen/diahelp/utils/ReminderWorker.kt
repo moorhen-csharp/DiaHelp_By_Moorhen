@@ -54,7 +54,7 @@ class ReminderWorker(
         )
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_sugar_note)
+            .setSmallIcon(R.drawable.ic_health_metr)
             .setContentTitle("Необходимо измерить уровень сахара")
             .setContentText("Введите значение сахара в DiaHelp")
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)

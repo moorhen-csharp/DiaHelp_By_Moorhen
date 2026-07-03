@@ -1,0 +1,9 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
+    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+        <TextView android:id="@+id/tvEditLabel" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Показатель" android:textSize="14sp" android:textStyle="bold" android:textColor="?attr/colorOnSurface"/>
+        <TextView android:id="@+id/tvEditNorm" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Норма: —" android:textSize="11sp" android:textColor="?attr/colorOnSurfaceVariant" android:layout_marginTop="2dp"/>
+    </LinearLayout>
+    <com.google.android.material.textfield.TextInputLayout android:id="@+id/tilEditValue" style="@style/Widget.Material3.TextInputLayout.OutlinedBox" android:layout_width="130dp" android:layout_height="wrap_content" app:boxCornerRadiusTopStart="12dp" app:boxCornerRadiusTopEnd="12dp" app:boxCornerRadiusBottomStart="12dp" app:boxCornerRadiusBottomEnd="12dp" app:suffixTextAppearance="@style/TextAppearance.Material3.BodySmall">
+        <com.google.android.material.textfield.TextInputEditText android:id="@+id/etEditValue" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="numberDecimal" android:textAlignment="center" android:hint="0.0"/>
+    </com.google.android.material.textfield.TextInputLayout>
+</LinearLayout>

@@ -1,4 +1,4 @@
-package dev.moorhen.diahelp.data.repository
+package dev.moorhen.diahelp.repository
 
 import android.content.Context
 import dev.moorhen.diahelp.data.db.AppDatabase
