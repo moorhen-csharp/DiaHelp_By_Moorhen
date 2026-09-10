@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.button.MaterialButton
@@ -44,7 +45,7 @@ class SugarEntryFragment : Fragment() {
         val sugarTypeGroup = view.findViewById<com.google.android.material.chip.ChipGroup>(R.id.chipSugarType)
         val healthGroup = view.findViewById<com.google.android.material.chip.ChipGroup>(R.id.chipHealth)
         val btnNotMeasured = view.findViewById<MaterialButton>(R.id.btnNotMeasured)
-        val btnSave = view.findViewById<MaterialButton>(R.id.btnSave)
+        val btnSave = view.findViewById<ImageButton>(R.id.btnSave)
 
         sugarTypeGroup.setOnCheckedChangeListener { group, checkedId ->
             val chip = group.findViewById<Chip>(checkedId)

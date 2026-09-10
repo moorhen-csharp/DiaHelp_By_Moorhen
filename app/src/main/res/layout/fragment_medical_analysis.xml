@@ -376,6 +376,7 @@
 
             <!-- HbA1c -->
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardHba1cEdit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="14dp"
@@ -453,6 +454,7 @@
 
             <!-- Показатели крови (редактирование) -->
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardBloodEdit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="14dp"
@@ -492,6 +494,7 @@
 
             <!-- Липидный профиль (редактирование) -->
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardLipidsEdit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="14dp"
@@ -531,6 +534,7 @@
 
             <!-- Биохимия (редактирование) -->
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardBiochemEdit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="24dp"

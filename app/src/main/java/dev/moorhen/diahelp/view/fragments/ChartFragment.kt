@@ -60,7 +60,6 @@ class ChartFragment : Fragment() {
                     R.id.btnChartInsulin -> viewModel.toggleMode(false)
                 }
                 updateChart(chartView, noDataText)
-                applyChartStyle(chartView)
             }
         }
 
@@ -68,7 +67,7 @@ class ChartFragment : Fragment() {
         viewModel.insulinData.observe(viewLifecycleOwner) { updateChart(chartView, noDataText) }
 
         viewModel.average.observe(viewLifecycleOwner) { avg ->
-                avgValue.text = String.format("%.1f ммоль/л", avg)
+            avgValue.text = String.format("%.1f ммоль/л", avg)
         }
 
         return view
@@ -82,15 +81,20 @@ class ChartFragment : Fragment() {
 
     /**
      * Задаём стиль графика программно через LineChart.LineSpec:
-     * - цвет линии зависит от режима (сахар = синий, инсулин = зелёный)
+     * - цвет линии
      * - полупрозрачная заливка под линией
      * - круглые точки на каждом замере
      * - толщина линии 2.5dp
+     *
+     * ВАЖНО: вызывается один раз при создании экрана, а не при каждом
+     * переключении Сахар/Инсулин. Vico привязывает свою систему анимации
+     * к конкретному экземпляру Chart на момент регистрации producer'а.
+     * Если пересоздавать LineChart на каждый клик, эта привязка рвётся,
+     * и анимация появления графика перестаёт работать после первого
+     * переключения.
      */
     private fun applyChartStyle(chartView: ChartView) {
-        val isSugar  = viewModel.isSugarMode.value ?: true
-        val colorRes = if (isSugar) R.color.color_chart else R.color.color_chart
-        val lineColor = ContextCompat.getColor(requireContext(), colorRes)
+        val lineColor = ContextCompat.getColor(requireContext(), R.color.color_chart)
 
         // Заливка под линией — тот же цвет, но с alpha ~24%
         val fillColor = (lineColor and 0x00FFFFFF) or (60 shl 24)

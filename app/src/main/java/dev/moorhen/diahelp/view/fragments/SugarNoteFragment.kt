@@ -50,14 +50,14 @@ class SugarNoteFragment : Fragment() {
         val dropdown = view.findViewById<AutoCompleteTextView>(R.id.periodDropdown)
         val avgText = view.findViewById<TextView>(R.id.textAverage)
         val noDataText = view.findViewById<TextView>(R.id.tvNoData)
-        val streakText = view.findViewById<TextView>(R.id.textStreak)
+        //val streakText = view.findViewById<TextView>(R.id.textStreak)
         val session = SessionManager(requireContext())
-        val streakIcon = view.findViewById<ImageView>(R.id.sugarStreak)
+        //val streakIcon = view.findViewById<ImageView>(R.id.sugarStreak)
         val toggleGroup = view.findViewById<MaterialButtonToggleGroup>(R.id.toggleGroup)
         val btnFood = view.findViewById<MaterialButton>(R.id.btnFood)
 
         val streak = session.getStreak()
-        updateStreakUI(streak, streakText, streakIcon)
+        //updateStreakUI(streak, streakText, streakIcon)
 
         val sugarRepository = SugarRepository(requireContext())
         val insulinRepository = InsulinRepository(requireContext())
@@ -162,7 +162,7 @@ class SugarNoteFragment : Fragment() {
         viewModel.loadInsulinNotes()
         viewModel.onPeriodChanged()
 
-        checkDailySugarDialog(session, streakText, streakIcon)
+        //checkDailySugarDialog(session, streakText, streakIcon)
 
         return view
     }
@@ -185,45 +185,45 @@ class SugarNoteFragment : Fragment() {
     }
 
     // ✅ Добавлен недостающий метод checkDailySugarDialog
-    private fun checkDailySugarDialog(
-        session: SessionManager,
-        streakText: TextView,
-        streakIcon: ImageView
-    ) {
-        val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
-
-        if (session.getLastAskDate() == today) return
-
-        val dialogView = layoutInflater.inflate(R.layout.dialog_sugar_streak, null)
-
-        val dialog = AlertDialog.Builder(requireContext())
-            .setView(dialogView)
-            .create()
-
-        dialog.window?.setBackgroundDrawable(
-            ContextCompat.getDrawable(requireContext(), R.drawable.shape_dialog_containers)
-        )
-
-        dialog.show()
-
-        val btnOk = dialogView.findViewById<Button>(R.id.btnOk)
-        val btnCancel = dialogView.findViewById<Button>(R.id.btnCancel)
-
-        btnOk.setOnClickListener {
-            session.saveStreak(0)
-            session.saveLastAskDate(today)
-            updateStreakUI(0, streakText, streakIcon)
-            dialog.dismiss()
-        }
-
-        btnCancel.setOnClickListener {
-            val newStreak = session.getStreak() + 1
-            session.saveStreak(newStreak)
-            session.saveLastAskDate(today)
-            updateStreakUI(newStreak, streakText, streakIcon)
-            dialog.dismiss()
-        }
-    }
+//    private fun checkDailySugarDialog(
+//        session: SessionManager,
+//        streakText: TextView,
+//        streakIcon: ImageView
+//    ) {
+//        val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+//
+//        if (session.getLastAskDate() == today) return
+//
+//        val dialogView = layoutInflater.inflate(R.layout.dialog_sugar_streak, null)
+//
+//        val dialog = AlertDialog.Builder(requireContext())
+//            .setView(dialogView)
+//            .create()
+//
+//        dialog.window?.setBackgroundDrawable(
+//            ContextCompat.getDrawable(requireContext(), R.drawable.shape_dialog_containers)
+//        )
+//
+//        dialog.show()
+//
+//        val btnOk = dialogView.findViewById<Button>(R.id.btnOk)
+//        val btnCancel = dialogView.findViewById<Button>(R.id.btnCancel)
+//
+//        btnOk.setOnClickListener {
+//            session.saveStreak(0)
+//            session.saveLastAskDate(today)
+//            updateStreakUI(0, streakText, streakIcon)
+//            dialog.dismiss()
+//        }
+//
+//        btnCancel.setOnClickListener {
+//            val newStreak = session.getStreak() + 1
+//            session.saveStreak(newStreak)
+//            session.saveLastAskDate(today)
+//            updateStreakUI(newStreak, streakText, streakIcon)
+//            dialog.dismiss()
+//        }
+//    }
 
     override fun onResume() {
         super.onResume()

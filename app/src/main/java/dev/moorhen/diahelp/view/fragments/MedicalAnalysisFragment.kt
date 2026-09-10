@@ -73,6 +73,14 @@ class MedicalAnalysisFragment : Fragment() {
     private lateinit var btnSave: MaterialButton
     private lateinit var hba1cInput: TextInputEditText
 
+    // Карточки редактирования (для скрытия по типу анализа)
+    private lateinit var cardHba1cEdit: MaterialCardView
+    private lateinit var cardBloodEdit: MaterialCardView
+    private lateinit var cardLipidsEdit: MaterialCardView
+    private lateinit var cardBiochemEdit: MaterialCardView
+
+    private var currentType: String = "blood"
+
     // Строки редактирования
     private lateinit var editCpeptide: View
     private lateinit var editHemoglobin: View
@@ -144,6 +152,12 @@ class MedicalAnalysisFragment : Fragment() {
         btnSave        = root.findViewById(R.id.btnSave)
         hba1cInput     = root.findViewById(R.id.hba1cInput)
 
+        // Карточки редактирования
+        cardHba1cEdit  = root.findViewById(R.id.cardHba1cEdit)
+        cardBloodEdit  = root.findViewById(R.id.cardBloodEdit)
+        cardLipidsEdit = root.findViewById(R.id.cardLipidsEdit)
+        cardBiochemEdit = root.findViewById(R.id.cardBiochemEdit)
+
         // Редактирование — строки
         editCpeptide    = root.findViewById(R.id.editCpeptide)
         editHemoglobin  = root.findViewById(R.id.editHemoglobin)
@@ -162,9 +176,12 @@ class MedicalAnalysisFragment : Fragment() {
     private fun setupContent() {
         val type  = arguments?.getString(ARG_TYPE)  ?: "blood"
         val title = arguments?.getString(ARG_TITLE) ?: "Анализы"
+        currentType = type
 
         viewTitleText.text = title
         editTitleText.text = "Редактирование"
+
+        applyTypeVisibility(type)
 
         // Настраиваем метки и нормы для строк просмотра
         setupViewRow(rowCpeptide,    "C-пептид",         "0.5–2.0 нг/мл")
@@ -197,6 +214,29 @@ class MedicalAnalysisFragment : Fragment() {
         viewModel.loadLatest(type)
     }
 
+    /**
+     * Скрывает карточки, не относящиеся к текущему типу анализа, чтобы, например,
+     * в "Липидном профиле" не показывались показатели крови или биохимия.
+     * Карточки, относящиеся к типу, дальше управляются showData()/switchToEditMode()
+     * в зависимости от наличия данных.
+     */
+    private fun applyTypeVisibility(type: String) {
+        val showHba1c   = type == "blood"
+        val showBlood   = type == "blood"
+        val showLipids  = type == "lipids"
+        val showBiochem = type == "biochem"
+
+        if (!showHba1c)   cardHba1cView.visibility = View.GONE
+        if (!showBlood)   cardBloodView.visibility = View.GONE
+        if (!showLipids)  cardLipidsView.visibility = View.GONE
+        if (!showBiochem) cardBiochemView.visibility = View.GONE
+
+        cardHba1cEdit.visibility   = if (showHba1c) View.VISIBLE else View.GONE
+        cardBloodEdit.visibility   = if (showBlood) View.VISIBLE else View.GONE
+        cardLipidsEdit.visibility  = if (showLipids) View.VISIBLE else View.GONE
+        cardBiochemEdit.visibility = if (showBiochem) View.VISIBLE else View.GONE
+    }
+
     private fun setupViewRow(row: View, label: String, norm: String) {
         row.findViewById<TextView>(R.id.tvRowLabel).text = label
         row.findViewById<TextView>(R.id.tvRowNorm).text  = "Норма: $norm"
@@ -213,21 +253,21 @@ class MedicalAnalysisFragment : Fragment() {
         btnCancelEdit.setOnClickListener { switchToViewMode() }
 
         btnSave.setOnClickListener {
-            val type = arguments?.getString(ARG_TYPE) ?: "blood"
+            val type = currentType
 
-            val hba1c       = hba1cInput.text.toString().toDoubleOrNull()
-            val cpeptide    = editCpeptide.et().toDoubleOrNull()
-            val hemoglobin  = editHemoglobin.et().toDoubleOrNull()
-            val leukocytes  = editLeukocytes.et().toDoubleOrNull()
-            val platelets   = editPlatelets.et().toDoubleOrNull()
-            val cholesterol = editCholesterol.et().toDoubleOrNull()
-            val hdl         = editHdl.et().toDoubleOrNull()
-            val ldl         = editLdl.et().toDoubleOrNull()
-            val triglyc     = editTriglycerides.et().toDoubleOrNull()
-            val creatinine  = editCreatinine.et().toDoubleOrNull()
-            val urea        = editUrea.et().toDoubleOrNull()
-            val alt         = editAlt.et().toDoubleOrNull()
-            val ast         = editAst.et().toDoubleOrNull()
+            val hba1c       = if (type == "blood")   hba1cInput.text.toString().toDoubleOrNull() else null
+            val cpeptide    = if (type == "blood")   editCpeptide.et().toDoubleOrNull() else null
+            val hemoglobin  = if (type == "blood")   editHemoglobin.et().toDoubleOrNull() else null
+            val leukocytes  = if (type == "blood")   editLeukocytes.et().toDoubleOrNull() else null
+            val platelets   = if (type == "blood")   editPlatelets.et().toDoubleOrNull() else null
+            val cholesterol = if (type == "lipids")  editCholesterol.et().toDoubleOrNull() else null
+            val hdl         = if (type == "lipids")  editHdl.et().toDoubleOrNull() else null
+            val ldl         = if (type == "lipids")  editLdl.et().toDoubleOrNull() else null
+            val triglyc     = if (type == "lipids")  editTriglycerides.et().toDoubleOrNull() else null
+            val creatinine  = if (type == "biochem") editCreatinine.et().toDoubleOrNull() else null
+            val urea        = if (type == "biochem") editUrea.et().toDoubleOrNull() else null
+            val alt         = if (type == "biochem") editAlt.et().toDoubleOrNull() else null
+            val ast         = if (type == "biochem") editAst.et().toDoubleOrNull() else null
 
             val anyFilled = listOf(hba1c, cpeptide, hemoglobin, leukocytes, platelets,
                 cholesterol, hdl, ldl, triglyc, creatinine, urea, alt, ast).any { it != null }
@@ -259,7 +299,7 @@ class MedicalAnalysisFragment : Fragment() {
             if (success == true) {
                 Toast.makeText(requireContext(), "✅ Анализы сохранены", Toast.LENGTH_SHORT).show()
                 switchToViewMode()
-                viewModel.loadLatest(arguments?.getString(ARG_TYPE) ?: "blood")
+                viewModel.loadLatest(currentType)
             }
         }
     }
@@ -276,7 +316,7 @@ class MedicalAnalysisFragment : Fragment() {
         viewDateText.text         = "Обновлено: ${dateFormat.format(record.date)}"
 
         // HbA1c — акцентная карточка
-        if (record.hba1c != null) {
+        if (currentType == "blood" && record.hba1c != null) {
             cardHba1cView.visibility = View.VISIBLE
             tvHba1cValue.text = "${record.hba1c} %"
             val status = when {
@@ -290,7 +330,7 @@ class MedicalAnalysisFragment : Fragment() {
         }
 
         // Показатели крови
-        val bloodAny = listOf(record.cpeptide, record.hemoglobin,
+        val bloodAny = currentType == "blood" && listOf(record.cpeptide, record.hemoglobin,
             record.leukocytes, record.platelets).any { it != null }
         cardBloodView.visibility = if (bloodAny) View.VISIBLE else View.GONE
         setViewRow(rowCpeptide,   record.cpeptide,   "нг/мл")
@@ -299,7 +339,7 @@ class MedicalAnalysisFragment : Fragment() {
         setViewRow(rowPlatelets,  record.platelets,  "×10⁹/л")
 
         // Липиды
-        val lipidsAny = listOf(record.cholesterol, record.hdl,
+        val lipidsAny = currentType == "lipids" && listOf(record.cholesterol, record.hdl,
             record.ldl, record.triglycerides).any { it != null }
         cardLipidsView.visibility = if (lipidsAny) View.VISIBLE else View.GONE
         setViewRow(rowCholesterol,   record.cholesterol,  "ммоль/л")
@@ -308,7 +348,7 @@ class MedicalAnalysisFragment : Fragment() {
         setViewRow(rowTriglycerides, record.triglycerides,"ммоль/л")
 
         // Биохимия
-        val biochemAny = listOf(record.creatinine, record.urea,
+        val biochemAny = currentType == "biochem" && listOf(record.creatinine, record.urea,
             record.alt, record.ast).any { it != null }
         cardBiochemView.visibility = if (biochemAny) View.VISIBLE else View.GONE
         setViewRow(rowCreatinine, record.creatinine, "мкмоль/л")
@@ -335,19 +375,27 @@ class MedicalAnalysisFragment : Fragment() {
         // Заполняем поля текущими значениями из последней записи
         val record = viewModel.latestRecord.value
         if (record != null) {
-            hba1cInput.setText(record.hba1c?.toString() ?: "")
-            setEditField(editCpeptide,    record.cpeptide)
-            setEditField(editHemoglobin,  record.hemoglobin)
-            setEditField(editLeukocytes,  record.leukocytes)
-            setEditField(editPlatelets,   record.platelets)
-            setEditField(editCholesterol, record.cholesterol)
-            setEditField(editHdl,         record.hdl)
-            setEditField(editLdl,         record.ldl)
-            setEditField(editTriglycerides, record.triglycerides)
-            setEditField(editCreatinine,  record.creatinine)
-            setEditField(editUrea,        record.urea)
-            setEditField(editAlt,         record.alt)
-            setEditField(editAst,         record.ast)
+            when (currentType) {
+                "blood" -> {
+                    hba1cInput.setText(record.hba1c?.toString() ?: "")
+                    setEditField(editCpeptide,    record.cpeptide)
+                    setEditField(editHemoglobin,  record.hemoglobin)
+                    setEditField(editLeukocytes,  record.leukocytes)
+                    setEditField(editPlatelets,   record.platelets)
+                }
+                "lipids" -> {
+                    setEditField(editCholesterol, record.cholesterol)
+                    setEditField(editHdl,         record.hdl)
+                    setEditField(editLdl,         record.ldl)
+                    setEditField(editTriglycerides, record.triglycerides)
+                }
+                "biochem" -> {
+                    setEditField(editCreatinine,  record.creatinine)
+                    setEditField(editUrea,        record.urea)
+                    setEditField(editAlt,         record.alt)
+                    setEditField(editAst,         record.ast)
+                }
+            }
         }
 
         viewModeContainer.visibility = View.GONE
