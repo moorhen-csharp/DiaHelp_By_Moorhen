@@ -16,12 +16,24 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+
+    <Button
+        android:id="@+id/btnHelpProject"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Помощь проекту"
+        android:backgroundTint="@color/greenNormal"
+        android:layout_marginStart="20dp"
+        android:layout_marginBottom="20dp"
+        android:textColor="@color/black"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
     <TextView
         android:id="@+id/tvName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="50dp"
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="50dp"
         android:text="Имя"
         android:textStyle="bold"
         android:textSize="18sp"

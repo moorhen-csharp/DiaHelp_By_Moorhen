@@ -3,6 +3,9 @@ package dev.moorhen.diahelp.view.fragments
 import android.Manifest
 import android.app.AlertDialog
 import android.app.TimePickerDialog
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
@@ -13,12 +16,14 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -26,10 +31,14 @@ import com.google.android.material.button.MaterialButton
 import dev.moorhen.diahelp.R
 import dev.moorhen.diahelp.utils.HealthConnectManager
 import dev.moorhen.diahelp.utils.HcSyncScheduler
+import dev.moorhen.diahelp.utils.SessionManager
 import dev.moorhen.diahelp.view.activity.AuthorizationActivity
 import dev.moorhen.diahelp.viewmodel.HcState
 import dev.moorhen.diahelp.viewmodel.HealthConnectViewModel
 import dev.moorhen.diahelp.viewmodel.ProfileViewModel
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class ProfileFragment : Fragment() {
 
@@ -99,6 +108,7 @@ class ProfileFragment : Fragment() {
         val tvReminderTime= view.findViewById<TextView>(R.id.tvReminderTime)
         val btnExportCsv  = view.findViewById<MaterialButton>(R.id.btnExportCsv)
         val btnExportPdf  = view.findViewById<MaterialButton>(R.id.btnExportPdf)
+        val btnHelpProject = view.findViewById<Button>(R.id.btnHelpProject)
 
         // ─── Health Connect вью ────────────────────────────────
         val tvHcStatus  = view.findViewById<TextView>(R.id.tvHcStatus)
@@ -126,6 +136,44 @@ class ProfileFragment : Fragment() {
             AppCompatDelegate.setDefaultNightMode(
                 if (isChecked) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
             )
+        }
+
+        fun HelpProject() {
+            val dialogView = layoutInflater.inflate(R.layout.dialog_help_project, null)
+
+            val dialog = AlertDialog.Builder(requireContext())
+                .setView(dialogView)
+                .create()
+
+            dialog.window?.setBackgroundDrawable(
+                ContextCompat.getDrawable(requireContext(), R.drawable.shape_dialog_containers)
+            )
+
+            dialog.show()
+
+            val btnOk = dialogView.findViewById<Button>(R.id.btnOk)
+            val btnCancel = dialogView.findViewById<Button>(R.id.btnCancel)
+
+            btnOk.setOnClickListener {
+                val CopyRequisites = "40817810100037833947"
+                val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                val clip = ClipData.newPlainText("label", CopyRequisites)
+
+                clipboard.setPrimaryClip(clip)
+
+                Toast.makeText(requireContext(), "Скопировано", Toast.LENGTH_SHORT).show()
+
+                dialog.dismiss()
+            }
+
+
+            btnCancel.setOnClickListener {
+                dialog.dismiss()
+            }
+        }
+
+        btnHelpProject.setOnClickListener {
+           HelpProject()
         }
 
         // ═══════════════════════════════════════════════════════
